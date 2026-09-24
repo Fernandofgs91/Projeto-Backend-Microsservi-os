@@ -1,0 +1,44 @@
+services:
+  restricao-service:
+    build:
+      context: ./restricao-service
+      dockerfile: Dockerfile
+    container_name: restricao-service
+    ports:
+      - "8082:8080"
+    networks:
+      - backend-network
+
+  cliente-service:
+    build:
+      context: ./cliente_service
+      dockerfile: Dockerfile
+    container_name: cliente-service
+    ports:
+      - "8081:8081"
+    environment:
+      - RESTRICAO_SERVICE_URL=http://restricao-service:8080
+    depends_on:
+      - restricao-service
+    networks:
+      - backend-network
+
+  api-gateway:
+    build:
+      context: ./api_gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - CLIENTE_SERVICE_URL=http://cliente-service:8081
+      - RESTRICAO_SERVICE_URL=http://restricao-service:8080
+    depends_on:
+      - cliente-service
+      - restricao-service
+    networks:
+      - backend-network
+
+networks:
+  backend-network:
+    driver: bridge

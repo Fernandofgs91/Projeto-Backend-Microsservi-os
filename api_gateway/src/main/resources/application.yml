@@ -1,0 +1,19 @@
+server:
+  port: 8080
+
+spring:
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+
+            - id: restricao-service
+              uri: ${RESTRICAO_URL:http://restricao-service:8082}
+              predicates:
+                - Path=/restricao/**
+
+            - id: cliente-service
+              uri: ${CLIENTE_URL:http://cliente-service:8081}
+              predicates:
+                - Path=/cliente/**
